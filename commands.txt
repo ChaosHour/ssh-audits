@@ -1,0 +1,3 @@
+pwd; hostname
+df -HlP
+for i in en{0..4}; do echo ${i}; ifconfig ${i} | egrep 'media|status'; done
