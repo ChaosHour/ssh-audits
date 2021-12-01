@@ -108,6 +108,9 @@ func main() {
 				log.Fatal(err)
 			}
 
+			// close the connection
+			defer client.Close()
+
 			// Get your output as []byte.
 			fmt.Println(string(out))
 		}
