@@ -36,8 +36,9 @@ en4
 ```
 
 #####  
-The main import used 
-github.com/melbahja/goph 
+The main import used for ssh is the ssh package.
+
+[Goph](https://github.com/melbahja/goph) - github.com/melbahja/goph 
 
 ```GO
 This was compiled for FreeBSD, but you can compile for the OS you wish.
@@ -45,3 +46,9 @@ This was compiled for FreeBSD, but you can compile for the OS you wish.
 FreeBSD:
 env GOOS=freebsd GOARCH=amd64 go build .
 ```
+
+### Thank you! Github Copilot
+
+[]: # Language: markdown
+[]: # Path: README.md
+# ssh-audits
