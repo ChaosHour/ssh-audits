@@ -44,7 +44,7 @@ en4
 #####  
 The main import used for ssh is the ssh package.
 
-[Goph](https://github.com/melbahja/goph) - github.com/melbahja/goph 
+[GOPH](https://github.com/melbahja/goph) - github.com/melbahja/goph 
 
 ```GO
 This was compiled for FreeBSD, but you can compile for the OS you wish.
