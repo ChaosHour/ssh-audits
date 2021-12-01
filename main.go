@@ -105,7 +105,8 @@ func main() {
 			fmt.Println(green("[+]"), "Executing", command)
 			out, err := client.Run(command)
 			if err != nil {
-				log.Fatal(err)
+				//	log.Fatal(err)
+				continue
 			}
 
 			// close the connection
