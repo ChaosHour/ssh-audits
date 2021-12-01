@@ -1,6 +1,12 @@
 # ssh-audits
 
 ### Usage
+```
+Replace the ip or fqdn from the hosts.txt and commands from the commands.txt file and run it.
+
+Did I really need to create this? No, not really, but it was fun and I wanted to learn how to do it.
+```
+
 ```GO
 MacBook-Pro:ssh-audits klarsen$ go run main.go
 Connecting as user:  klarsen
