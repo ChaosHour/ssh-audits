@@ -4,7 +4,7 @@
 ```GO
 MacBook-Pro:ssh-audits klarsen$ go run main.go
 Connecting as user:  klarsen
-[+] Connected to 10.8.0.11
+[+] Connected to 10.x.x.x
 [+] Executing pwd; hostname
 /Users/klarsen
 Mac-Book-Pro2.local
