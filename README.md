@@ -47,8 +47,4 @@ FreeBSD:
 env GOOS=freebsd GOARCH=amd64 go build .
 ```
 
-### Thank you! Github Copilot
-
-[]: # Language: markdown
-[]: # Path: README.md
-# ssh-audits
+### Thank you! [Github Copilot](https://copilot.github.com/)
