@@ -1,10 +1,23 @@
 # ssh-audits
 
-### Usage
-```
+## Usage
+
+```GO
+
+To install the package:
+go get -u github.com/ChaosHour/ssh-audits
+
+or download the source code:
+git clone git@github.com:ChaosHour/ssh-audits.git
+
+What is the best way to run the package?
 Replace the ip or fqdn from the hosts.txt and commands from the commands.txt file and run it.
 
-Did I really need to create this? No, not really, but it was fun and I wanted to learn how to do it.
+You can use multple hosts and multiple commands. No spaces in either file.
+
+Did I really need to create this? 
+No, not really, but it was fun and I wanted to learn how to do it.
+
 ```
 
 ```GO
@@ -41,16 +54,32 @@ en4
         status: inactive
 ```
 
-#####  
+###
+
 The main import used for ssh is the ssh package.
 
-[GOPH](https://github.com/melbahja/goph) - github.com/melbahja/goph 
+[GOPH](https://github.com/melbahja/goph) - github.com/melbahja/goph
+
+I used the ssh package to connect to the remote host and execute commands.
 
 ```GO
+☛ Start Connection With SSH Agent (Unix systems only):
+auth, err := goph.UseAgent()
+if err != nil {
+	// handle error
+}
+
+client, err := goph.New("root", "192.1.1.3", auth)
+```
+
+
+```GO
+
 This was compiled for FreeBSD, but you can compile for the OS you wish.
 
 FreeBSD:
 env GOOS=freebsd GOARCH=amd64 go build .
+
 ```
 
 ### Thank you! [Github Copilot](https://copilot.github.com/)
