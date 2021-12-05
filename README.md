@@ -54,9 +54,7 @@ en4
         status: inactive
 ```
 
-##
-
-The main import used for ssh is the ssh package.
+## The main import used for ssh is the ssh package
 
 [GOPH](https://github.com/melbahja/goph) - github.com/melbahja/goph
 
