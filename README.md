@@ -54,7 +54,7 @@ en4
         status: inactive
 ```
 
-###
+##
 
 The main import used for ssh is the ssh package.
 
@@ -63,22 +63,26 @@ The main import used for ssh is the ssh package.
 I used the ssh package to connect to the remote host and execute commands.
 
 ```GO
+SSH Agent was used to connect to the remote hosts. Example provided by the ssh package.
+
 ☛ Start Connection With SSH Agent (Unix systems only):
 auth, err := goph.UseAgent()
 if err != nil {
-	// handle error
+       // handle error
 }
 
 client, err := goph.New("root", "192.1.1.3", auth)
 ```
 
-
 ```GO
 
-This was compiled for FreeBSD, but you can compile for the OS you wish.
+To compile this for FreeBSD:
 
 FreeBSD:
 env GOOS=freebsd GOARCH=amd64 go build .
+
+On Mac:
+env GOOS=darwin GOARCH=amd64 go build .
 
 ```
 
