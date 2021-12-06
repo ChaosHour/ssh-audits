@@ -13,7 +13,7 @@ git clone git@github.com:ChaosHour/ssh-audits.git
 What is the best way to run the package?
 Replace the ip or fqdn from the hosts.txt and commands from the commands.txt file and run it.
 
-You can use multple hosts and multiple commands. No spaces in either file.
+You can use multiple hosts and multiple commands. No spaces in either file.
 
 Did I really need to create this? 
 No, not really, but it was fun and I wanted to learn how to do it.
