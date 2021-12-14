@@ -21,7 +21,7 @@ No, not really, but it was fun and I wanted to learn how to do it.
 ```
 
 ```GO
-MacBook-Pro:ssh-audits klarsen$ go run main.go
+MacBook-Pro:ssh-audits klarsen$ ./ssh-audits
 Connecting as user:  klarsen
 [+] Connected to 10.x.x.x
 [+] Executing pwd; hostname
