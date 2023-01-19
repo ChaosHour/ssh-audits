@@ -81,6 +81,14 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// if UseAgent fails try to use protected private key
+	if err != nil {
+		auth, err = goph.Key(os.Getenv("HOME")+"/.ssh/id_rsa", "Your-passphrase-here")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	// connecting as user, print user name
 	fmt.Println(green("Connecting as user: "), User)
 
