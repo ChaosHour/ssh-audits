@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/user"
 
 	"github.com/fatih/color"
 	"github.com/melbahja/goph"
+	"github.com/mikkeloscar/sshconfig"
 	_ "golang.org/x/crypto/ssh"
 	_ "golang.org/x/crypto/ssh/agent"
 	_ "golang.org/x/crypto/ssh/knownhosts"
@@ -18,11 +18,8 @@ import (
 var green = color.New(color.FgGreen).SprintFunc()
 var red = color.New(color.FgRed).SprintFunc()
 
-// define hosts
-var hosts = readHosts()
-
-// read hosts from file
-func readHosts() []string {
+// read the hosts file in map
+func readHosts() map[string]string {
 	// open file
 	file, err := os.Open("hosts.txt")
 	if err != nil {
@@ -32,10 +29,10 @@ func readHosts() []string {
 	// defer file close
 	defer file.Close()
 	// read file
-	hosts := []string{}
+	hosts := map[string]string{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		hosts = append(hosts, scanner.Text())
+		hosts[scanner.Text()] = scanner.Text()
 	}
 	return hosts
 }
@@ -62,39 +59,49 @@ func readCommands() []string {
 	return commands
 }
 
-// check for current user who is running this and return the user name
-func CurrentUser() string {
-	usr, err := user.Current()
+// main function
+func main() {
+	// get user home directory
+	dirname, err := os.UserHomeDir()
 	if err != nil {
 		log.Fatal(err)
 	}
-	return usr.Username
-}
+	fmt.Println(dirname)
 
-// User represents a user account.
-var User = (os.Getenv("USER"))
+	// parse ssh config file for user
+	hosts, err := sshconfig.Parse(dirname + "/.ssh/config")
+	if err != nil {
+		fmt.Println(err)
+	}
 
-func main() {
-
+	// use ssh agent
 	auth, err := goph.UseAgent()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// if UseAgent fails try to use protected private key
-	if err != nil {
-		auth, err = goph.Key(os.Getenv("HOME")+"/.ssh/id_rsa", "Your-passphrase-here")
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	validHosts := readHosts()
 
-	// connecting as user, print user name
-	fmt.Println(green("Connecting as user: "), User)
-
-	//  Start Connection With SSH Agent using goph and looping through hosts in hosts.txt file
+	//  Start Connection With SSH Agent using goph
 	for _, host := range hosts {
-		client, err := goph.New(User, host, auth)
+		fmt.Printf("%+v\n", host)
+
+		shouldConnect := false
+		if _, ok := validHosts[host.HostName]; !ok {
+			for _, h := range host.Host {
+				if _, ok := validHosts[h]; ok {
+					shouldConnect = true
+					break
+				}
+			}
+		}
+		if !shouldConnect {
+			fmt.Println(red("[!]"), "Skipping...")
+			continue
+		}
+		fmt.Println(green(fmt.Sprintf("Connecting to Host=%v as %v@%v", host.Host, host.User, host.HostName)))
+
+		client, err := goph.New(host.User, host.HostName, auth)
 		if err != nil {
 			fmt.Println(red("[!]"), "Failed to connect to", host)
 			//log.Fatal(red(err))
