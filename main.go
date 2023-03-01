@@ -2,13 +2,14 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
+	"os/user"
 
 	"github.com/fatih/color"
 	"github.com/melbahja/goph"
-	"github.com/mikkeloscar/sshconfig"
 	_ "golang.org/x/crypto/ssh"
 	_ "golang.org/x/crypto/ssh/agent"
 	_ "golang.org/x/crypto/ssh/knownhosts"
@@ -18,8 +19,16 @@ import (
 var green = color.New(color.FgGreen).SprintFunc()
 var red = color.New(color.FgRed).SprintFunc()
 
-// read the hosts file in map
-func readHosts() map[string]string {
+// define the command line flags with subcommands.
+var (
+	file = flag.String("i", "", "Ansible inventory file")
+)
+
+// define hosts
+var hosts = readHosts()
+
+// read hosts from file
+func readHosts() []string {
 	// open file
 	file, err := os.Open("hosts.txt")
 	if err != nil {
@@ -29,10 +38,10 @@ func readHosts() map[string]string {
 	// defer file close
 	defer file.Close()
 	// read file
-	hosts := map[string]string{}
+	hosts := []string{}
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		hosts[scanner.Text()] = scanner.Text()
+		hosts = append(hosts, scanner.Text())
 	}
 	return hosts
 }
@@ -59,49 +68,39 @@ func readCommands() []string {
 	return commands
 }
 
-// main function
-func main() {
-	// get user home directory
-	dirname, err := os.UserHomeDir()
+// check for current user who is running this and return the user name
+func CurrentUser() string {
+	usr, err := user.Current()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(dirname)
+	return usr.Username
+}
 
-	// parse ssh config file for user
-	hosts, err := sshconfig.Parse(dirname + "/.ssh/config")
-	if err != nil {
-		fmt.Println(err)
+// User represents a user account.
+var User = (os.Getenv("USER"))
+
+func main() {
+	flag.Parse()
+
+	// Check if flag -i is set. If it is set, call the util function to read from the Ansible inventory file.
+	if *file != "" {
+		utils()
+		return
 	}
 
-	// use ssh agent
+	// Use SSH Agent to connect to hosts
 	auth, err := goph.UseAgent()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	validHosts := readHosts()
+	// connecting as user, print user name
+	fmt.Println(green("Connecting as user: "), User)
 
-	//  Start Connection With SSH Agent using goph
+	//  Start Connection With SSH Agent using goph and looping through hosts in hosts.txt file
 	for _, host := range hosts {
-		fmt.Printf("%+v\n", host)
-
-		shouldConnect := false
-		if _, ok := validHosts[host.HostName]; !ok {
-			for _, h := range host.Host {
-				if _, ok := validHosts[h]; ok {
-					shouldConnect = true
-					break
-				}
-			}
-		}
-		if !shouldConnect {
-			fmt.Println(red("[!]"), "Skipping...")
-			continue
-		}
-		fmt.Println(green(fmt.Sprintf("Connecting to Host=%v as %v@%v", host.Host, host.User, host.HostName)))
-
-		client, err := goph.New(host.User, host.HostName, auth)
+		client, err := goph.New(User, host, auth)
 		if err != nil {
 			fmt.Println(red("[!]"), "Failed to connect to", host)
 			//log.Fatal(red(err))
