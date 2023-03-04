@@ -5,17 +5,33 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 
 	"github.com/fatih/color"
 	"github.com/relex/aini"
+
+	"github.com/melbahja/goph"
+	_ "golang.org/x/crypto/ssh"
+	_ "golang.org/x/crypto/ssh/agent"
+	_ "golang.org/x/crypto/ssh/knownhosts"
 )
 
 // define the command line flags with subcommands.
 //var (
 //	file = flag.String("i", "", "Ansible inventory file")
 //)
+
+var (
+	err    error
+	auth   goph.Auth
+	client *goph.Client
+	addr   string
+	//user   string
+	port uint
+	key  string
+)
 
 func utils() {
 	flag.Parse()
@@ -32,6 +48,39 @@ func utils() {
 	case "hosts":
 		for _, host := range inv.Hosts {
 			color.Green("%s", host.Name)
+			// Uing the output of the case limit subcommand, we can use the output to ssh into the host using the goph library
+			auth, err := goph.Key(strings.TrimPrefix(host.Vars["ansible_ssh_private_key_file"], "Vars: "), "")
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			client, err := goph.New(strings.TrimPrefix(host.Vars["ansible_user"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_host"], "Vars: "), auth)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Defer closing the network connection.
+			defer client.Close()
+
+			// print success
+			fmt.Println(green("[+]"), "Connected to", host)
+
+			// Execute your command.
+			for _, command := range commands {
+				fmt.Println(green("[+]"), "Executing", command)
+				out, err := client.Run(command)
+				if err != nil {
+					//	log.Fatal(err)
+					continue
+				}
+
+				// close the connection
+				defer client.Close()
+
+				// Get your output as []byte.
+				fmt.Println(string(out))
+			}
+
 		}
 	case "groups":
 		for _, group := range inv.Groups {
@@ -53,14 +102,54 @@ func utils() {
 	case "limit":
 		for _, host := range inv.Hosts {
 			if host.Name == flag.Arg(1) {
-				color.Yellow("ssh -i %s -p %s %s@%s \n", strings.TrimPrefix(host.Vars["ansible_ssh_private_key_file"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_port"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_user"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_host"], "Vars: "))
+				//color.Yellow("ssh -i %s -p %s %s@%s \n", strings.TrimPrefix(host.Vars["ansible_ssh_private_key_file"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_port"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_user"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_host"], "Vars: "))
+				// Uing the output of the case limit subcommand, we can use the output to ssh into the host using the goph library
+				auth, err := goph.Key(strings.TrimPrefix(host.Vars["ansible_ssh_private_key_file"], "Vars: "), "")
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				client, err := goph.New(strings.TrimPrefix(host.Vars["ansible_user"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_host"], "Vars: "), auth)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				// Defer closing the network connection.
+				defer client.Close()
+
+				// print success
+				fmt.Println(green("[+]"), "Connected to", host)
+
+				// Execute your command.
+				for _, command := range commands {
+					fmt.Println(green("[+]"), "Executing", command)
+					out, err := client.Run(command)
+					if err != nil {
+						//	log.Fatal(err)
+						continue
+					}
+
+					// close the connection
+					defer client.Close()
+
+					// Get your output as []byte.
+					fmt.Println(string(out))
+				}
+
 			}
 		}
-
 	default:
-		fmt.Println("Usage: go run main.go [subcommand] [flags]")
-		fmt.Println("Subcommands: hosts, groups, vars, ssh, limit")
-		fmt.Println("Flags: -i inventory file")
+		color.Green("Usage: go run main.go [subcommand] [flags]")
+		color.Green("Subcommands: hosts, groups, vars, ssh, limit")
+		// add color to the output for each subcommand
+		color.Red("Subcommands: hosts[run against all hosts], limit[run against a specific host], ssh[print ssh command to]")
+		// add an example of how to use the program
+		color.Yellow("Example: go run . -i inventory/hosts hosts")
+		color.Yellow("Example: go run . -i inventory/hosts limit primary")
+		color.Yellow("Example: go run . -i inventory/hosts ssh")
+		//fmt.Println("Subcommands: hosts)[run against all hosts], limit[run against a specific host], ssh[print ssh command to]")
+		color.Green("Flags: -i inventory file")
+		color.Green("Default to using the hosts.txt: go run .")
 
 	}
 }
