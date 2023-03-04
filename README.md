@@ -23,7 +23,7 @@ No, not really, but it was fun and I wanted to learn how to do it.
 ```
 
 ```GO
-(data-sync) klarsen@Mac-Book-Pro2 ssh-audits % go run . -i inventory/hosts 
+(data-sync) klarsen@Mac-Book-Pro2 ssh-audits % ./ssh-audits -i inventory/hosts 
 Usage: go run main.go [subcommand] [flags]
 Subcommands: hosts, groups, vars, ssh, limit
 Subcommands: hosts[run against all hosts], limit[run against a specific host], ssh[print ssh command to]
@@ -31,7 +31,7 @@ Example: go run . -i inventory/hosts hosts
 Example: go run . -i inventory/hosts limit primary
 Example: go run . -i inventory/hosts ssh
 Flags: -i inventory file
-Default to using the hosts.txt: go run .
+Default to using the hosts.txt: ./ssh-audits
 
 
 Run against a specific host:
