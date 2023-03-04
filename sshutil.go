@@ -139,17 +139,17 @@ func utils() {
 			}
 		}
 	default:
-		color.Green("Usage: go run main.go [subcommand] [flags]")
+		color.Green("Usage: ./ssh-audits -i inventory/hosts [subcommand] [flags]")
 		color.Green("Subcommands: hosts, groups, vars, ssh, limit")
 		// add color to the output for each subcommand
 		color.Red("Subcommands: hosts[run against all hosts], limit[run against a specific host], ssh[print ssh command to]")
 		// add an example of how to use the program
-		color.Yellow("Example: go run . -i inventory/hosts hosts")
-		color.Yellow("Example: go run . -i inventory/hosts limit primary")
-		color.Yellow("Example: go run . -i inventory/hosts ssh")
+		color.Yellow("Example: ./ssh-audits -i inventory/hosts hosts")
+		color.Yellow("Example: ./ssh-audits -i inventory/hosts limit primary")
+		color.Yellow("Example: ./ssh-audits -i inventory/hosts ssh")
 		//fmt.Println("Subcommands: hosts)[run against all hosts], limit[run against a specific host], ssh[print ssh command to]")
 		color.Green("Flags: -i inventory file")
-		color.Green("Default to using the hosts.txt: go run .")
+		color.Green("Default to using the hosts.txt: ./ssh-audits")
 
 	}
 }
