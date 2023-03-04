@@ -197,7 +197,9 @@ cpu cores	: 2
 10.8.0.151
 ```
 
+```GO
 On Mac:
 env GOOS=darwin GOARCH=amd64 go build .
+```
 
 ### Thank you! [Github Copilot](https://copilot.github.com/)
