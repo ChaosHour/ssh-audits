@@ -24,12 +24,12 @@ No, not really, but it was fun and I wanted to learn how to do it.
 
 ```GO
 (data-sync) klarsen@Mac-Book-Pro2 ssh-audits % ./ssh-audits -i inventory/hosts 
-Usage: go run main.go [subcommand] [flags]
+Usage: ./ssh-audits -i inventory/hosts [subcommand] [flags]
 Subcommands: hosts, groups, vars, ssh, limit
 Subcommands: hosts[run against all hosts], limit[run against a specific host], ssh[print ssh command to]
-Example: go run . -i inventory/hosts hosts
-Example: go run . -i inventory/hosts limit primary
-Example: go run . -i inventory/hosts ssh
+Example: ./ssh-audits -i inventory/hosts hosts
+Example: ./ssh-audits -i inventory/hosts limit primary
+Example: ./ssh-audits -i inventory/hosts ssh
 Flags: -i inventory file
 Default to using the hosts.txt: ./ssh-audits
 
