@@ -1,6 +1,2 @@
 pwd; hostname
 ip a s enp0s8 | egrep -o 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | cut -d' ' -f2
-sudo -H orchestrator-client -c discover -i 10.8.0.152:3306
-sudo -H orchestrator-client -c discover -i 10.8.0.153:3306
-sudo -H orchestrator-client -c discover -i 10.8.0.154:3306
-sudo -H orchestrator-client -c topology -i primary
