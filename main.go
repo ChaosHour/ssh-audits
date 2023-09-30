@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -17,6 +18,11 @@ import (
 // define colors
 var green = color.New(color.FgGreen).SprintFunc()
 var red = color.New(color.FgRed).SprintFunc()
+
+// define the command line flags with subcommands.
+var (
+	file = flag.String("i", "", "Ansible inventory file")
+)
 
 // define hosts
 var hosts = readHosts()
@@ -75,7 +81,15 @@ func CurrentUser() string {
 var User = (os.Getenv("USER"))
 
 func main() {
+	flag.Parse()
 
+	// Check if flag -i is set. If it is set, call the util function to read from the Ansible inventory file.
+	if *file != "" {
+		utils()
+		return
+	}
+
+	// Use SSH Agent to connect to hosts
 	auth, err := goph.UseAgent()
 	if err != nil {
 		log.Fatal(err)
