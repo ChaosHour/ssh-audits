@@ -20,9 +20,9 @@ var green = color.New(color.FgGreen).SprintFunc()
 var red = color.New(color.FgRed).SprintFunc()
 
 // define the command line flags with subcommands.
-var (
-	file = flag.String("i", "", "Ansible inventory file")
-)
+//var (
+//	file = flag.String("i", "", "Ansible inventory file")
+//)
 
 // define hosts
 var hosts = readHosts()
