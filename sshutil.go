@@ -35,15 +35,15 @@ var (
 	showVars     = flag.Bool("vars", false, "show host vars from inventory file")
 )
 
-var (
-	err    error
-	auth   goph.Auth
-	client *goph.Client
-	addr   string
-	//user   string
-	port uint
-	key  string
-)
+//var (
+// err    error
+// auth   goph.Auth
+// client *goph.Client
+// addr   string
+// user   string
+// port uint
+// key  string
+//)
 
 type Group struct {
 	Name     string
@@ -123,6 +123,12 @@ func connectToHost() {
 		log.Fatal(err)
 	}
 
+	// create a new color object
+	green := color.New(color.FgGreen).SprintFunc()
+
+	// print success
+	fmt.Printf("%s Connected to %s\n", green("[+]"), *host)
+
 	defer client.Close()
 
 	output, err := client.Run(*command)
@@ -131,49 +137,55 @@ func connectToHost() {
 	}
 
 	fmt.Println(string(output))
-
-	/*
-		for _, host := range inv.Hosts {
-			color.Green("%s", host.Name)
-			// Uing the output of the case limit subcommand, we can use the output to ssh into the host using the goph library
-			auth, err := goph.Key(strings.TrimPrefix(host.Vars["ansible_ssh_private_key_file"], "Vars: "), "")
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			client, err := goph.New(strings.TrimPrefix(host.Vars["ansible_user"], "Vars: "), strings.TrimPrefix(host.Vars["ansible_host"], "Vars: "), auth)
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// Defer closing the network connection.
-			defer client.Close()
-
-			// print success
-			fmt.Println(green("[+]"), "Connected to", host)
-
-			// Execute your command.
-			for _, command := range commands {
-				fmt.Println(green("[+]"), "Executing", command)
-				out, err := client.Run(command)
-				if err != nil {
-					//	log.Fatal(err)
-					continue
-				}
-
-				// close the connection
-				defer client.Close()
-
-				// Get your output as []byte.
-				fmt.Println(string(out))
-			}
-
-		}
-	*/
 }
 
 func connectToGroup() {
-	// TODO: implement connectToGroup function
+	// parse the inventory file
+	inv, err := aini.ParseFile(*file)
+	if err != nil {
+		fmt.Printf("Error: %s ", err)
+		os.Exit(1)
+	}
+
+	// find the group in the inventory
+	group, ok := inv.Groups[*group]
+	if !ok {
+		fmt.Printf("Error: group %s not found in inventory", *group)
+		os.Exit(1)
+	}
+
+	// iterate over the hosts in the group
+	// create a new color object
+	green := color.New(color.FgGreen).SprintFunc()
+	red := color.New(color.FgRed).SprintFunc()
+
+	for _, host := range group.Hosts {
+		// create an SSH client config
+		auth, err := goph.Key(strings.TrimPrefix(host.Vars["ansible_ssh_private_key_file"], "Vars: "), "")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// connect to the host using the IP address specified by the ansible_host variable
+		client, err := goph.New(strings.TrimPrefix(host.Vars["ansible_user"], "Vars: "), host.Vars["ansible_host"], auth)
+		if err != nil {
+			fmt.Printf("%s Error: failed to connect to host %s:\n %v\n", red("[-]"), host.Name, err)
+			continue
+		}
+
+		// execute the command
+		out, err := client.Run(*command)
+		if err != nil {
+			fmt.Printf("%s Error: failed to execute command on host %s:\n %v\n", red("[-]"), host.Name, err)
+			continue
+		}
+
+		// print the output
+		fmt.Printf("%s Connected to host %s:\n%s\n", green("[+]"), host.Name, out)
+
+		// close the connection
+		client.Close()
+	}
 }
 
 func executeCommand() {
