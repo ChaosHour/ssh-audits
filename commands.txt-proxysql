@@ -1,4 +1,0 @@
-pwd; hostname
-ip a s enp0s8 | egrep -o 'inet [0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | cut -d' ' -f2
-sudo -H mysql -e "load mysql servers to runtime"
-sudo -H mysql -e "SELECT hostgroup_id, hostname, status, weight FROM runtime_mysql_servers ORDER BY hostgroup_id, weight DESC"
