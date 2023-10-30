@@ -9,6 +9,7 @@ import (
 	"os/user"
 	"strings"
 
+	_ "github.com/ChaosHour/ssh-audits/pkg/sftp"
 	"github.com/fatih/color"
 	"github.com/melbahja/goph"
 	"github.com/relex/aini"
@@ -32,6 +33,7 @@ var (
 	limit        = flag.String("l", "", "Limit to hosts")
 	limitGroup   = flag.String("lg", "", "Limit to groups")
 	sshUser      = flag.String("u", "", "User to connect as")
+	sftpFile     = flag.String("sftp", "", "File to SFTP")
 	listHosts    = flag.Bool("hosts", false, "List hosts")
 	listGroups   = flag.Bool("groups", false, "List groups")
 	showVars     = flag.Bool("vars", false, "show host vars from inventory file")
@@ -202,6 +204,29 @@ func CurrentUser() string {
 // User represents a user account.
 var User = (os.Getenv("USER"))
 
+/*
+func Scp2Remote() {
+	// Parse the inventory file
+	inv, err := aini.ParseFile(*file)
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+		return
+	}
+
+
+	// Execute the scp command
+	cmd := exec.Command("scp", *scpFile, fmt.Sprintf("%s@%s:/tmp/", h.Vars["ansible_user"], h.Vars["ansible_host"]))
+	err = cmd.Run()
+	if err != nil {
+		fmt.Printf("Error: %s\n", err)
+		return
+	}
+
+	fmt.Println("File copied successfully")
+}
+
+*/
+
 func main() {
 	flag.Parse()
 
@@ -210,6 +235,16 @@ func main() {
 		utils()
 		return
 	}
+
+	/*
+		if *sftpFile != "" {
+			err := sftp.ExecuteCommandOnHost(*file, *host, *sftpFile)
+			if err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+	*/
 
 	// Use SSH Agent to connect to hosts
 	auth, err := goph.UseAgent()

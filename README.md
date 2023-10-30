@@ -99,6 +99,32 @@ tmpfs           101M  4.1k  101M   1% /run/user/1002
 
 ```
 
+## Added sftp support
+
+```GO
+❯ go run . -i inventory/hosts -h primary -sftp './my-thing.sh'                                      
+Uploading file ./my-thing.sh to /tmp/my-thing.sh
+File uploaded successfully
+Making file /tmp/my-thing.sh executable
+File made executable successfully
+Executing file /tmp/my-thing.sh
+
+
+
+
+sh-audits on  adding_scp:main [!?] via 🐹 v1.21.3 
+❯ go run . -i inventory/hosts -h primary -c 'sudo -H bash -c /tmp/my-thing.sh'  
+[+] Connected to primary
++----------------+----------------------+----------+
+| host_short     | users                | COUNT(*) |
++----------------+----------------------+----------+
+| 192.168.50.153 | repl                 |        1 |
+| 192.168.50.154 | repl                 |        1 |
+| localhost      | event_scheduler,root |        2 |
+| total          |                      |        4 |
++----------------+----------------------+----------+
+```
+
 
 ```GO
 Install the package:
@@ -107,13 +133,6 @@ go install github.com/ChaosHour/ssh-audits@latest
 or download the source code:
 git clone git@github.com:ChaosHour/ssh-audits.git
 
-What is the best way to run the package?
-Replace the ip or fqdn from the hosts.txt and commands from the commands.txt file and run it.
-
-You can use multiple hosts and multiple commands. No spaces in either file.
-
-Did I really need to create this? 
-No, not really, but it was fun and I wanted to learn how to do it.
 
 ```
 

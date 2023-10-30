@@ -1,11 +1,17 @@
-[moc]
-alias ansible_host=
-alias ansible_host= 
-alias ansible_host=
+[mysql]
+primary    ansible_host=192.168.50.152 ansible_user=vagrant ansible_ssh_private_key_file=/Users/klarsen/projects/data-sync/.vagrant/machines/primary/virtualbox/private_key
+replica    ansible_host=192.168.50.153 ansible_user=vagrant ansible_ssh_private_key_file=/Users/klarsen/projects/data-sync/.vagrant/machines/replica/virtualbox/private_key
+etlreplica ansible_host=192.168.50.154 ansible_user=vagrant ansible_ssh_private_key_file=/Users/klarsen/projects/data-sync/.vagrant/machines/etlreplica/virtualbox/private_key
 
-[prod:children]
-moc
 
-[prod:vars]
+[control]
+proxysql      ansible_host=192.168.50.150  ansible_user=vagrant ansible_ssh_private_key_file=/Users/klarsen/projects/data-sync/.vagrant/machines/proxysql/virtualbox/private_key
+orchestrator  ansible_host=192.168.50.151  ansible_user=vagrant ansible_ssh_private_key_file=/Users/klarsen/projects/data-sync/.vagrant/machines/orchestrator/virtualbox/private_key
+
+
+[vlab:children]
+mysql
+control
+
+[vlab:vars]
 ansible_python_interpreter=/usr/bin/python3
-ansible_user=ubuntu

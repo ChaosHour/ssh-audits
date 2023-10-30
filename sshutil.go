@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ChaosHour/ssh-audits/pkg/sftp"
 	"github.com/fatih/color"
 	"github.com/melbahja/goph"
 
@@ -174,6 +175,9 @@ func utils() {
 	flag.Parse()
 
 	switch {
+
+	case *sftpFile != "":
+		sftp.ExecuteCommandOnHost(*sftpFile, *file, *host)
 	case *host != "":
 		connectToHost()
 	case *group != "":
@@ -197,7 +201,7 @@ func utils() {
 	case *showVars:
 		Vars()
 	default:
-		fmt.Println("Usage: sshutil [-i inventory-file] [-h host] [-g group] [-c command] [-l limit] [-lg limit-group] [-u ssh-user] [-hosts] [-groups] [-e exclude-host] [-eg exclude-group] [-vars]")
+		fmt.Println("Usage: sshutil [-i inventory-file] [-h host] [-g group] [-c command] [-l limit] [-lg limit-group] [-u ssh-user] [-hosts] [-groups] [-e exclude-host] [-eg exclude-group] [-vars] [-scp scp-file]")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
