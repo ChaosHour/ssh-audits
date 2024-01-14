@@ -34,9 +34,10 @@ var (
 	limitGroup   = flag.String("lg", "", "Limit to groups")
 	sshUser      = flag.String("u", "", "User to connect as")
 	sftpFile     = flag.String("sftp", "", "File to SFTP")
-	listHosts    = flag.Bool("hosts", false, "List hosts")
-	listGroups   = flag.Bool("groups", false, "List groups")
-	showVars     = flag.Bool("vars", false, "show host vars from inventory file")
+	//addPublicKey = flag.Bool("addkey", false, "Add public key to server")
+	listHosts  = flag.Bool("hosts", false, "List hosts")
+	listGroups = flag.Bool("groups", false, "List groups")
+	showVars   = flag.Bool("vars", false, "show host vars from inventory file")
 )
 
 //var (

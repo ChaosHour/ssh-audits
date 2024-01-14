@@ -20,6 +20,14 @@ import (
 	_ "golang.org/x/crypto/ssh/knownhosts"
 )
 
+/*
+// Work on this later:
+func addNewHost() {
+	// Add the new host to known hosts file.
+	return goph.AddKnownHost(host, remote, key, "")
+}
+*/
+
 func connectToGroup() {
 	// parse the inventory file
 	inv, err := aini.ParseFile(*file)
@@ -201,7 +209,7 @@ func utils() {
 	case *showVars:
 		Vars()
 	default:
-		fmt.Println("Usage: sshutil [-i inventory-file] [-h host] [-g group] [-c command] [-l limit] [-lg limit-group] [-u ssh-user] [-hosts] [-groups] [-e exclude-host] [-eg exclude-group] [-vars] [-scp scp-file]")
+		fmt.Println("Usage: ssh-audits [-i inventory-file] [-h host] [-g group] [-c command] [-l limit] [-lg limit-group] [-u ssh-user] [-hosts] [-groups] [-e exclude-host] [-eg exclude-group] [-vars] [-sftp sftp-file]")
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
