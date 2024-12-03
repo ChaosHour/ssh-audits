@@ -1,10 +1,12 @@
 package sftp
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	_ "github.com/fatih/color"
 	"github.com/melbahja/goph"
@@ -16,21 +18,35 @@ import (
 )
 
 func UploadFileAndExecute(client *goph.Client, localFilePath, remoteFilePath string) error {
-	// Check if the local file exists
-	_, err := os.Stat(localFilePath)
-	if err != nil {
-		return fmt.Errorf("error checking local file: %w", err)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	defer func() {
+		if _, err := client.Run("rm -f " + remoteFilePath); err != nil {
+			fmt.Printf("Warning: failed to cleanup remote file: %v\n", err)
+		}
+	}()
+
+	if _, err := os.Stat(localFilePath); err != nil {
+		return fmt.Errorf("error accessing local file: %w", err)
 	}
 
-	// Upload the local file to the remote server
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("upload timed out")
+	default:
+		if err := client.Upload(localFilePath, remoteFilePath); err != nil {
+			return fmt.Errorf("upload failed: %w", err)
+		}
+	}
+
 	fmt.Printf("Uploading file %s to %s\n", localFilePath, remoteFilePath)
-	err = client.Upload(localFilePath, remoteFilePath)
+	err := client.Upload(localFilePath, remoteFilePath)
 	if err != nil {
 		return fmt.Errorf("error uploading file: %w", err)
 	}
 	fmt.Println("File uploaded successfully")
 
-	// Make the remote file executable
 	fmt.Printf("Making file %s executable\n", remoteFilePath)
 	_, err = client.Run("chmod +x " + remoteFilePath)
 	if err != nil {
@@ -52,7 +68,7 @@ func UploadFileAndExecute(client *goph.Client, localFilePath, remoteFilePath str
 	return nil
 }
 
-func ExecuteCommandOnHost(sftpFile, file, host string) error {
+func ExecuteCommandOnHost(sftpFile, inventoryFile, hostName string) error {
 	//file = flag.String("i", "", "Ansible inventory file")
 	//host = flag.String("h", "", "Host to connect to")
 	//flag.Parse()
@@ -61,15 +77,15 @@ func ExecuteCommandOnHost(sftpFile, file, host string) error {
 	// Parse the inventory file
 
 	// Parse the inventory file
-	inv, err := aini.ParseFile(file)
+	inv, err := aini.ParseFile(inventoryFile)
 	if err != nil {
 		return fmt.Errorf("error parsing inventory file: %w", err)
 	}
 
 	// Find the host in the inventory
-	h, ok := inv.Hosts[host]
+	h, ok := inv.Hosts[hostName]
 	if !ok {
-		return fmt.Errorf("error: host %s not found in inventory", host)
+		return fmt.Errorf("error: host %s not found in inventory", hostName)
 	}
 
 	// Execute the command on the specified host
