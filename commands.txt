@@ -1,2 +1,4 @@
-echo "I am executing from the commandss.txt file!" 
-sudo bash -c /tmp/my-thing.sh
+pwd; ls -lrt 
+sudo -H mysql -t -e "select @@hostname; SELECT SUBSTRING_INDEX(host, ':', 1) AS host_short, GROUP_CONCAT(DISTINCT USER) AS users, COUNT(*) FROM information_schema.processlist GROUP BY host_short UNION ALL SELECT 'total', '', count(*) as TOTAL FROM information_schema.processlist ORDER BY 3, 2"
+sudo -H mysql -e "SELECT ID,USER,HOST,DB,COMMAND,TIME,STATE,INFO FROM information_schema.processlist WHERE time > 1  AND command !='Sleep' AND user NOT IN('system user','event_scheduler')\G"
+sudo -H mysqladmin extended-status | grep -wi 'threads_connected\|threads_running' | awk '{ print $2,$4}'

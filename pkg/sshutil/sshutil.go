@@ -34,6 +34,7 @@ var (
 	LimitGroup     = flag.String("lg", "", "Limit execution to specified groups (comma-separated)")
 	CommandsFile   = flag.String("f", "commands.txt", "Path to commands file")
 	Timeout        = flag.Duration("timeout", 30*time.Second, "Command execution timeout")
+	Port           = flag.Int("p", 22, "SSH port number")
 )
 
 // Colors
@@ -112,14 +113,23 @@ func Run() error {
 
 // Export functions (capitalize first letter)
 func AddNewHost(hostname string, remote net.Addr, key ssh.PublicKey) error {
-	// Get user's home directory
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return fmt.Errorf("failed to get home directory: %w", err)
 	}
 
+	knownHostsFile := filepath.Join(home, ".ssh", "known_hosts")
+
+	// Check if known_hosts file exists and contains the host
+	if hostData, err := os.ReadFile(knownHostsFile); err == nil {
+		if strings.Contains(string(hostData), string(ssh.MarshalAuthorizedKey(key))) {
+			fmt.Printf("%s Host %s already in known_hosts\n", green("[*]"), hostname)
+			return nil
+		}
+	}
+
 	// Add the new host to known hosts file
-	err = goph.AddKnownHost(hostname, remote, key, filepath.Join(home, ".ssh", "known_hosts"))
+	err = goph.AddKnownHost(hostname, remote, key, knownHostsFile)
 	if err != nil {
 		return fmt.Errorf("failed to add known host: %w", err)
 	}
@@ -142,6 +152,7 @@ func ConnectToGroup(inv *aini.InventoryData) error {
 			Auth: auth,
 			User: strings.TrimPrefix(host.Vars["ansible_user"], "Vars: "),
 			Addr: strings.TrimPrefix(host.Vars["ansible_host"], "Vars: "),
+			Port: uint(*Port), // Convert int to uint
 			Callback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 				return AddNewHost(hostname, remote, key)
 			},
@@ -174,10 +185,19 @@ func ConnectToHost(inv *aini.InventoryData) error {
 		return fmt.Errorf("failed to use SSH agent: %w", err)
 	}
 
+	user := strings.TrimPrefix(h.Vars["ansible_user"], "Vars: ")
+	addr := strings.TrimPrefix(h.Vars["ansible_host"], "Vars: ")
+
+	if addr == "" {
+		// If ansible_host is not set, use the hostname
+		addr = h.Name
+	}
+
 	config := &goph.Config{
 		Auth: auth,
-		User: strings.TrimPrefix(h.Vars["ansible_user"], "Vars: "),
-		Addr: strings.TrimPrefix(h.Vars["ansible_host"], "Vars: "),
+		User: user,
+		Addr: addr,
+		Port: uint(*Port), // Convert int to uint
 		Callback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
 			return AddNewHost(hostname, remote, key)
 		},
@@ -190,6 +210,32 @@ func ConnectToHost(inv *aini.InventoryData) error {
 	defer client.Close()
 
 	ExecuteCommands(client, h.Name)
+	return nil
+}
+
+// ConnectToDirect connects directly to a host without using inventory
+func ConnectToDirect(hostname string) error {
+	auth, err := goph.UseAgent()
+	if err != nil {
+	}
+
+	config := &goph.Config{
+		Auth: auth,
+		User: os.Getenv("USER"),
+		Addr: hostname,
+		Port: uint(*Port), // Convert int to uint
+		Callback: func(hostname string, remote net.Addr, key ssh.PublicKey) error {
+			return AddNewHost(hostname, remote, key)
+		},
+	}
+
+	client, err := goph.NewConn(config)
+	if err != nil {
+		return fmt.Errorf("failed to connect to host %s: %w", hostname, err)
+	}
+	defer client.Close()
+
+	ExecuteCommands(client, hostname)
 	return nil
 }
 

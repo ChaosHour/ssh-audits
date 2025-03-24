@@ -1,10 +1,10 @@
 #! /usr/bin/env bash
 
-mysql -t -e "SELECT SUBSTRING_INDEX(host, ':', 1) AS host_short, GROUP_CONCAT(DISTINCT USER) AS users, COUNT(*) FROM information_schema.processlist GROUP BY host_short UNION ALL SELECT 'total', '', count(*) as TOTAL FROM information_schema.processlist ORDER BY 3, 2"
+sudo -H mysql -t -e "SELECT SUBSTRING_INDEX(host, ':', 1) AS host_short, GROUP_CONCAT(DISTINCT USER) AS users, COUNT(*) FROM information_schema.processlist GROUP BY host_short UNION ALL SELECT 'total', '', count(*) as TOTAL FROM information_schema.processlist ORDER BY 3, 2"
 
 #mysql -t -e "select @@read_only"
 
-#mysqladmin extended-status | grep -wi 'threads_connected\|threads_running' | awk '{ print $2,$4}'
+sudo -H mysqladmin extended-status | grep -wi 'threads_connected\|threads_running' | awk '{ print $2,$4}'
 
 #pt-show-grants
 

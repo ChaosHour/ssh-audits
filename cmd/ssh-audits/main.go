@@ -15,19 +15,34 @@ var (
 func main() {
 	flag.Parse()
 
-	if *sshutil.File == "" {
-		log.Fatal("Inventory file (-i) is required")
-	}
-
-	// Handle SFTP operations
-	if *sftpFile != "" {
+	// Handle SFTP operations first
+	if *sftpFile != "" && *sshutil.Host != "" {
+		// If no inventory file is specified, try direct connection
+		if *sshutil.File == "" {
+			if err := sftp.ExecuteCommandOnHostDirect(*sftpFile, *sshutil.Host); err != nil {
+				log.Fatal(err)
+			}
+			return
+		}
+		// Use inventory file if specified
 		if err := sftp.ExecuteCommandOnHost(*sftpFile, *sshutil.File, *sshutil.Host); err != nil {
 			log.Fatal(err)
 		}
 		return
 	}
 
-	// Use sshutil package for all other operations
+	// Handle regular SSH operations
+	if *sshutil.Host != "" && *sshutil.File == "" {
+		if err := sshutil.ConnectToDirect(*sshutil.Host); err != nil {
+			log.Fatal(err)
+		}
+		return
+	}
+
+	if *sshutil.File == "" {
+		log.Fatal("Inventory file (-i) is required for non-direct connections")
+	}
+
 	if err := sshutil.Run(); err != nil {
 		log.Fatal(err)
 	}
