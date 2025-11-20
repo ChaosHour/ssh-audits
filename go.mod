@@ -1,12 +1,12 @@
 module github.com/ChaosHour/ssh-audits
 
-go 1.17
+go 1.24.0
 
 require (
 	github.com/fatih/color v1.13.0
 	github.com/melbahja/goph v1.4.0
 	github.com/relex/aini v1.6.0
-	golang.org/x/crypto v0.35.0
+	golang.org/x/crypto v0.45.0
 )
 
 require (
@@ -18,6 +18,6 @@ require (
 	github.com/pkg/sftp v1.13.6 // indirect
 	github.com/samber/lo v1.38.1 // indirect
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
-	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/sys v0.38.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
