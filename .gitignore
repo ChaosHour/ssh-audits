@@ -13,3 +13,9 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+# Local, site-specific command lists (see commands.txt.example)
+commands.txt
+commands-KEEP.txt
+
+# graphify knowledge-graph output
+graphify-out/

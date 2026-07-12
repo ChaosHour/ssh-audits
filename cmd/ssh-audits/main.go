@@ -1,49 +1,18 @@
 package main
 
 import (
-	"flag"
-	"log"
+	"fmt"
+	"os"
 
-	"github.com/ChaosHour/ssh-audits/pkg/sftp"
-	"github.com/ChaosHour/ssh-audits/pkg/sshutil"
+	"github.com/ChaosHour/ssh-audits/internal/cli"
 )
 
-var (
-	sftpFile = flag.String("sftp", "", "File to SFTP")
-)
+// version is set at build time via -ldflags "-X main.version=v1.2.3".
+var version = "dev"
 
 func main() {
-	flag.Parse()
-
-	// Handle SFTP operations first
-	if *sftpFile != "" && *sshutil.Host != "" {
-		// If no inventory file is specified, try direct connection
-		if *sshutil.File == "" {
-			if err := sftp.ExecuteCommandOnHostDirect(*sftpFile, *sshutil.Host); err != nil {
-				log.Fatal(err)
-			}
-			return
-		}
-		// Use inventory file if specified
-		if err := sftp.ExecuteCommandOnHost(*sftpFile, *sshutil.File, *sshutil.Host); err != nil {
-			log.Fatal(err)
-		}
-		return
-	}
-
-	// Handle regular SSH operations
-	if *sshutil.Host != "" && *sshutil.File == "" {
-		if err := sshutil.ConnectToDirect(*sshutil.Host); err != nil {
-			log.Fatal(err)
-		}
-		return
-	}
-
-	if *sshutil.File == "" {
-		log.Fatal("Inventory file (-i) is required for non-direct connections")
-	}
-
-	if err := sshutil.Run(); err != nil {
-		log.Fatal(err)
+	if err := cli.Run(version); err != nil {
+		fmt.Fprintln(os.Stderr, "ssh-audits:", err)
+		os.Exit(1)
 	}
 }

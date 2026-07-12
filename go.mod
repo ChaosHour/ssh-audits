@@ -7,6 +7,7 @@ require (
 	github.com/melbahja/goph v1.4.0
 	github.com/relex/aini v1.6.0
 	golang.org/x/crypto v0.52.0
+	golang.org/x/sync v0.22.0
 )
 
 require (

@@ -1,2 +1,0 @@
-echo "I am executing from the commandss.txt file!" 
-sudo bash -c /tmp/my-thing.sh
