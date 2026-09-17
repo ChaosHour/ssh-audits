@@ -22,7 +22,7 @@ go install github.com/ChaosHour/ssh-audits/cmd/ssh-audits@latest
 # or from source:
 git clone git@github.com:ChaosHour/ssh-audits.git
 cd ssh-audits
-go build ./cmd/ssh-audits
+make build   # binary lands in ./bin/ssh-audits
 ```
 
 Authentication uses your local SSH agent (`ssh-add -l` should list a key).
@@ -172,9 +172,10 @@ Executing /tmp/ssh-audits.a1B2c3/my-thing.sh
 ## Development
 
 ```sh
-go build ./...   # build
-go test ./...    # run unit tests
-go vet ./...     # static checks
+make build   # build, binary lands in ./bin/ssh-audits
+make test    # run unit tests
+make vet     # static checks
+make clean   # remove ./bin
 ```
 
 Layout: `cmd/ssh-audits` is the entry point; the logic lives in
